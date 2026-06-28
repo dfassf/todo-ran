@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* 토스풍 컬러 */
+  --color-bg: #ffffff;
+  --color-surface: #f9fafb; /* 살짝 회색 면 */
+  --color-surface-strong: #f2f4f6; /* 인풋/칩 배경 */
+  --color-border: #e5e8eb;
+  --color-border-strong: #d1d6db;
+  --color-text: #191f28; /* 본문 텍스트 */
+  --color-text-sub: #4e5968; /* 보조 텍스트 */
+  --color-muted: #8b95a1; /* 비활성/플레이스홀더 */
+  --color-accent: #3182f6; /* 토스 블루 */
+  --color-accent-soft: #e8f3ff;
+  --color-danger: #f04452;
+  --color-success: #00c471;
+
+  /* 사이즈 토큰 */
+  --size-control-lg: 56px; /* 주요 인풋·CTA 버튼 */
+  --size-control-md: 48px; /* 보조 버튼 */
+  --size-control-sm: 40px; /* 작은 버튼·칩 */
+  --size-fab: 56px;
+  --size-completion: 44px; /* 완수 동그라미 */
+
+  /* 텍스트 위계 */
+  --font-display: 28px; /* 화면 헤딩 */
+  --font-title: 20px; /* 카드 헤딩 */
+  --font-body: 16px; /* 본문 */
+  --font-sub: 14px; /* 보조 */
+  --font-caption: 13px; /* 캡션 */
+  --font-tiny: 12px; /* 메타 */
+
+  /* radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  /* 간격 */
+  --pad-page: 20px; /* 페이지 좌우 패딩 */
+
+  /* 그림자 (거의 안 씀) */
+  --shadow-fab: 0 6px 16px rgba(49, 130, 246, 0.28);
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Pretendard", "Apple SD Gothic Neo",
+    "Noto Sans KR", system-ui, sans-serif;
+  font-feature-settings: "tnum";
+  font-size: var(--font-body);
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+button {
+  -webkit-user-select: none;
+  user-select: none;
+  font-family: inherit;
+}
+
+input,
+textarea {
+  font-family: inherit;
+}
+
+/* iOS 자동 줌 방지 */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+textarea {
+  font-size: 16px;
+}
+
+/* 시트 슬라이드 업 */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.sheet-overlay {
+  animation: overlay-in 180ms ease-out;
+}
+.sheet-panel {
+  animation: sheet-up 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
