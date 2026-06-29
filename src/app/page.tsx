@@ -5,6 +5,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import ProgressBar from "@/components/ProgressBar";
 import EmptyState from "@/components/EmptyState";
 import SortableTodoList from "@/components/SortableTodoList";
+import EditTodoSheet from "@/components/EditTodoSheet";
 import { useTodosByDate } from "@/hooks/useTodos";
 import { useCategories } from "@/hooks/useCategories";
 import { todayString, isPast, formatMonthDay } from "@/lib/date";
@@ -16,6 +17,7 @@ type Tab = "today" | "past";
 
 export default function HomePage() {
   const [tab, setTab] = useState<Tab>("today");
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const today = todayString();
 
   const { categories } = useCategories();
@@ -61,8 +63,11 @@ export default function HomePage() {
             await reorderTodos(orderedIds);
             dispatchTodoChanged();
           }}
+          onEdit={setEditingTodo}
         />
       )}
+
+      <EditTodoSheet todo={editingTodo} onClose={() => setEditingTodo(null)} />
     </div>
   );
 }

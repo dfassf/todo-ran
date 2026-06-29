@@ -7,11 +7,14 @@ import { useAllTodos } from "@/hooks/useTodos";
 import { useCategories } from "@/hooks/useCategories";
 import EmptyState from "@/components/EmptyState";
 import DateGroupedSortable from "@/components/DateGroupedSortable";
+import EditTodoSheet from "@/components/EditTodoSheet";
 import { updateTodo, deleteTodo, reorderTodos } from "@/lib/db/repo";
 import { dispatchTodoChanged } from "@/lib/events";
+import type { Todo } from "@/types";
 
 export default function ListPage() {
   const [query, setQuery] = useState("");
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const { todos, refresh } = useAllTodos();
   const { categories } = useCategories();
 
@@ -33,10 +36,7 @@ export default function ListPage() {
       .map(([date, items]) => ({ date, todos: items }));
   }, [filtered]);
 
-  const catMap = useMemo(
-    () => new Map(categories.map((c) => [c.id, c])),
-    [categories]
-  );
+  const catMap = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
 
   return (
     <div>
@@ -44,10 +44,7 @@ export default function ListPage() {
 
       <div className="px-5 pb-4">
         <div className="relative">
-          <Search
-            size={18}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
-          />
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
           <input
             type="text"
             placeholder="검색"
@@ -84,8 +81,11 @@ export default function ListPage() {
             dispatchTodoChanged();
             await refresh();
           }}
+          onEdit={setEditingTodo}
         />
       )}
+
+      <EditTodoSheet todo={editingTodo} onClose={() => setEditingTodo(null)} />
     </div>
   );
 }

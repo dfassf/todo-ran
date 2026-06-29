@@ -36,6 +36,7 @@ interface Props {
   onDelete: (id: string) => Promise<void>;
   onReorder: (orderedIds: string[]) => Promise<void>; // 같은 날 안에서 순서
   onMoveDate: (id: string, newDate: string) => Promise<void>; // 다른 날로 이동
+  onEdit?: (todo: Todo) => void;
 }
 
 // 그룹별 todo id 맵. dndId는 단순히 todo.id 그대로 사용.
@@ -46,6 +47,7 @@ export default function DateGroupedSortable({
   onDelete,
   onReorder,
   onMoveDate,
+  onEdit,
 }: Props) {
   // 외부 groups 변화 우선. drag 직후 잠깐 임시 상태가 필요하면 setLocalGroups로 처리.
   const [localGroups, setLocalGroups] = useState<DateGroup[] | null>(null);
@@ -113,9 +115,11 @@ export default function DateGroupedSortable({
     await onMoveDate(todo.id, toDate);
   };
 
-  const activeTodo = activeId ? allIds.includes(activeId)
-    ? display.flatMap((g) => g.todos).find((t) => t.id === activeId) ?? null
-    : null : null;
+  const activeTodo = activeId
+    ? allIds.includes(activeId)
+      ? (display.flatMap((g) => g.todos).find((t) => t.id === activeId) ?? null)
+      : null
+    : null;
   const activeCategory = activeTodo?.category_id
     ? (catMap.get(activeTodo.category_id) ?? null)
     : null;
@@ -142,6 +146,7 @@ export default function DateGroupedSortable({
                     category={t.category_id ? (catMap.get(t.category_id) ?? null) : null}
                     onUpdate={(patch) => onUpdate(t.id, patch)}
                     onDelete={() => onDelete(t.id)}
+                    onEdit={onEdit ? () => onEdit(t) : undefined}
                   />
                 ))}
               </ul>
@@ -164,11 +169,7 @@ export default function DateGroupedSortable({
 
       <ConfirmDialog
         open={!!pendingMove}
-        title={
-          pendingMove
-            ? `${formatMonthDayWithWeekday(pendingMove.toDate)}로 옮길까요?`
-            : ""
-        }
+        title={pendingMove ? `${formatMonthDayWithWeekday(pendingMove.toDate)}로 옮길까요?` : ""}
         description={pendingMove ? `"${pendingMove.todo.title}"의 날짜를 변경합니다.` : ""}
         confirmLabel="옮기기"
         onConfirm={confirmMove}
@@ -183,11 +184,13 @@ function SortableRow({
   category,
   onUpdate,
   onDelete,
+  onEdit,
 }: {
   todo: Todo;
   category: Category | null;
   onUpdate: (patch: Partial<Todo>) => Promise<void>;
   onDelete: () => Promise<void>;
+  onEdit?: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: todo.id,
@@ -206,6 +209,7 @@ function SortableRow({
         category={category}
         onUpdate={onUpdate}
         onDelete={onDelete}
+        onEdit={onEdit}
         isDragging={isDragging}
         dragHandleProps={{ ...attributes, ...listeners }}
       />

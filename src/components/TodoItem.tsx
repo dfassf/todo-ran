@@ -12,13 +12,24 @@ export interface TodoItemProps extends HTMLAttributes<HTMLDivElement> {
   category: Category | null;
   onUpdate: (patch: Partial<Todo>) => Promise<void>;
   onDelete: () => Promise<void>;
+  onEdit?: () => void;
   dragHandleProps?: HTMLAttributes<HTMLButtonElement>;
   isDragging?: boolean;
   style?: CSSProperties;
 }
 
 const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
-  { todo, category, onUpdate, onDelete, dragHandleProps, isDragging = false, style, ...rest },
+  {
+    todo,
+    category,
+    onUpdate,
+    onDelete,
+    onEdit,
+    dragHandleProps,
+    isDragging = false,
+    style,
+    ...rest
+  },
   ref
 ) {
   const done = !!todo.completed_at;
@@ -46,15 +57,28 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
     >
       <div className="flex-none">{renderMethod()}</div>
 
-      <div className="min-w-0 flex-1">
-        <span
-          className={`block truncate text-body ${
-            done ? "text-muted line-through" : "text-text"
-          }`}
+      {onEdit ? (
+        <button
+          type="button"
+          onClick={onEdit}
+          className="min-w-0 flex-1 text-left active:opacity-60"
+          aria-label="할 일 수정"
         >
-          {todo.title}
-        </span>
-      </div>
+          <span
+            className={`block truncate text-body ${done ? "text-muted line-through" : "text-text"}`}
+          >
+            {todo.title}
+          </span>
+        </button>
+      ) : (
+        <div className="min-w-0 flex-1">
+          <span
+            className={`block truncate text-body ${done ? "text-muted line-through" : "text-text"}`}
+          >
+            {todo.title}
+          </span>
+        </div>
+      )}
 
       <button
         type="button"

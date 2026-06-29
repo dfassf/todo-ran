@@ -26,6 +26,7 @@ interface Props {
   onUpdate: (id: string, patch: Partial<Todo>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onReorder: (orderedIds: string[]) => Promise<void>;
+  onEdit?: (todo: Todo) => void;
 }
 
 // 한 그룹 (같은 due_date) 안에서의 sortable.
@@ -36,6 +37,7 @@ export default function SortableTodoList({
   onUpdate,
   onDelete,
   onReorder,
+  onEdit,
 }: Props) {
   const [orderedIds, setOrderedIds] = useState<string[] | null>(null);
 
@@ -74,6 +76,7 @@ export default function SortableTodoList({
               category={t.category_id ? (catMap.get(t.category_id) ?? null) : null}
               onUpdate={(patch) => onUpdate(t.id, patch)}
               onDelete={() => onDelete(t.id)}
+              onEdit={onEdit ? () => onEdit(t) : undefined}
             />
           ))}
         </ul>
@@ -87,11 +90,13 @@ function SortableRow({
   category,
   onUpdate,
   onDelete,
+  onEdit,
 }: {
   todo: Todo;
   category: Category | null;
   onUpdate: (patch: Partial<Todo>) => Promise<void>;
   onDelete: () => Promise<void>;
+  onEdit?: () => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: todo.id,
@@ -111,6 +116,7 @@ function SortableRow({
         category={category}
         onUpdate={onUpdate}
         onDelete={onDelete}
+        onEdit={onEdit}
         isDragging={isDragging}
         dragHandleProps={{ ...attributes, ...listeners }}
       />

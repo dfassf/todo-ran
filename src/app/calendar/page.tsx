@@ -18,15 +18,18 @@ import { useAllTodos, useTodosByDate } from "@/hooks/useTodos";
 import { useCategories } from "@/hooks/useCategories";
 import CategoryDot from "@/components/CategoryDot";
 import SortableTodoList from "@/components/SortableTodoList";
+import EditTodoSheet from "@/components/EditTodoSheet";
 import EmptyState from "@/components/EmptyState";
 import { reorderTodos } from "@/lib/db/repo";
 import { dispatchTodoChanged } from "@/lib/events";
+import type { Todo } from "@/types";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
 export default function CalendarPage() {
   const [anchor, setAnchor] = useState(new Date());
   const [selected, setSelected] = useState(toDateString(new Date()));
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 
   const grid = useMemo(() => getMonthGrid(anchor), [anchor]);
   const { todos: allTodos } = useAllTodos();
@@ -153,9 +156,12 @@ export default function CalendarPage() {
               await reorderTodos(orderedIds);
               dispatchTodoChanged();
             }}
+            onEdit={setEditingTodo}
           />
         )}
       </div>
+
+      <EditTodoSheet todo={editingTodo} onClose={() => setEditingTodo(null)} />
     </div>
   );
 }
