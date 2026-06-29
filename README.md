@@ -1,5 +1,7 @@
 # 투두리스트 (todo-ran)
 
+[![CI](https://github.com/shinwoo-um/todo-ran/actions/workflows/ci.yml/badge.svg)](https://github.com/shinwoo-um/todo-ran/actions/workflows/ci.yml)
+
 물리적 행동으로만 완료 처리되는, 카테고리 색상이 한눈에 보이는 투두 웹앱.
 
 > 와이프가 쓰라고 만든 개인 프로젝트입니다. 월간 캘린더로 한눈에 보면서 날짜별로도 따로 관리하고, 카테고리별 색상으로 종류를 구분하고 싶다는 요구사항에서 출발했습니다. iOS 앱 [닷투대시(dottodash.today)](https://dottodash.today/) 를 레퍼런스로 참고했고, **카테고리 색상 닷** 차별점을 더했습니다. 코드와 디자인 자산은 일체 사용하지 않았습니다.
