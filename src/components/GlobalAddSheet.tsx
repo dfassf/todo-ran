@@ -24,7 +24,7 @@ export default function GlobalAddSheet() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="pointer-events-auto absolute right-5 bottom-[88px] flex h-fab w-fab items-center justify-center rounded-full bg-accent text-white shadow-fab transition-transform active:scale-95"
+          className="pointer-events-auto absolute right-5 bottom-[96px] flex h-fab w-fab items-center justify-center rounded-full bg-accent text-white shadow-fab transition-transform active:scale-95"
           aria-label="새 할 일"
           style={{ marginBottom: "env(safe-area-inset-bottom)" }}
         >

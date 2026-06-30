@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AutoSeedRunner />
           <div
             className="mx-auto w-full max-w-app min-h-screen bg-bg"
-            style={{ paddingBottom: "calc(64px + env(safe-area-inset-bottom))" }}
+            style={{ paddingBottom: "calc(84px + env(safe-area-inset-bottom))" }}
           >
             {children}
           </div>
