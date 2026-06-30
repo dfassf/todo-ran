@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import { useAllTodos } from "@/hooks/useTodos";
@@ -10,6 +10,8 @@ import DateGroupedSortable from "@/components/DateGroupedSortable";
 import EditTodoSheet from "@/components/EditTodoSheet";
 import { updateTodo, deleteTodo, reorderTodos } from "@/lib/db/repo";
 import { dispatchTodoChanged } from "@/lib/events";
+import { todayString } from "@/lib/date";
+import { useSelectedDate } from "@/components/SelectedDateProvider";
 import type { Todo } from "@/types";
 
 export default function ListPage() {
@@ -17,6 +19,12 @@ export default function ListPage() {
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const { todos, refresh } = useAllTodos();
   const { categories } = useCategories();
+
+  // 리스트 페이지에서 + 누르면 오늘 날짜로 추가됨
+  const { setSelectedDate } = useSelectedDate();
+  useEffect(() => {
+    setSelectedDate(todayString());
+  }, [setSelectedDate]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();

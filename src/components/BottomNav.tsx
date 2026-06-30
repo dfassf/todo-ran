@@ -11,39 +11,57 @@ const TABS = [
   { href: "/settings", label: "설정", icon: Settings },
 ];
 
-// 떠 있는 알약(pill) 형태의 하단 내비.
-// 활성 탭은 accent-soft 배경 캡슐 + 아이콘 + 라벨이 가로로 펼쳐짐.
-// 비활성 탭은 아이콘만 (공간 절약 + 시각적 강조).
+// Material You (Android 14+) Pill Navigation 스타일.
+// - 화면 바닥에서 살짝 띄움 (floating)
+// - 활성 탭의 "아이콘 뒤에 알약 모양 강조 캡슐" + 라벨 표시
+// - 비활성 탭은 아이콘만
+// - 둥근 알약 형태 바 + 부드러운 elevation
 export default function BottomNav() {
   const pathname = usePathname();
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-20 w-full max-w-app -translate-x-1/2 px-5"
+      className="fixed bottom-0 left-1/2 z-20 w-full max-w-app -translate-x-1/2 px-4"
       style={{
         paddingBottom: "calc(12px + env(safe-area-inset-bottom))",
       }}
       aria-label="하단 내비게이션"
     >
       <ul
-        className="flex h-[60px] items-center justify-around rounded-xl bg-bg/90 px-2 backdrop-blur-md"
+        className="flex h-[68px] items-center justify-around rounded-[28px] bg-bg px-2"
         style={{
-          boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04)",
+          boxShadow: "0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04)",
         }}
       >
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
-            <li key={href}>
+            <li key={href} className="flex-1">
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex h-11 items-center justify-center gap-1.5 rounded-md px-3 transition-all ${
-                  active ? "bg-accent-soft text-accent" : "text-muted active:bg-surface-strong"
-                }`}
+                aria-label={label}
+                className="flex h-full flex-col items-center justify-center gap-1"
               >
-                <Icon size={22} strokeWidth={active ? 2.4 : 1.8} />
-                {active && <span className="text-sub font-semibold">{label}</span>}
+                {/* Material You 시그니처: 활성 탭만 아이콘 뒤에 알약 캡슐 */}
+                <span
+                  className={`flex h-8 w-16 items-center justify-center rounded-full transition-colors ${
+                    active ? "bg-accent-soft" : ""
+                  }`}
+                >
+                  <Icon
+                    size={22}
+                    strokeWidth={active ? 2.4 : 1.8}
+                    className={active ? "text-accent" : "text-muted"}
+                  />
+                </span>
+                <span
+                  className={`text-tiny ${
+                    active ? "font-bold text-accent" : "font-medium text-muted"
+                  }`}
+                >
+                  {label}
+                </span>
               </Link>
             </li>
           );

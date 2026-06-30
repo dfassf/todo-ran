@@ -7,8 +7,8 @@ import Sheet from "./ui/Sheet";
 import TodoForm from "./TodoForm";
 import { useUserId } from "@/hooks/useUserId";
 import { createTodo } from "@/lib/db/repo";
-import { todayString } from "@/lib/date";
 import { dispatchTodoChanged } from "@/lib/events";
+import { useSelectedDate } from "./SelectedDateProvider";
 
 const HIDDEN_ROUTES = ["/settings", "/login"];
 
@@ -24,7 +24,7 @@ export default function GlobalAddSheet() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="pointer-events-auto absolute right-5 bottom-[96px] flex h-fab w-fab items-center justify-center rounded-full bg-accent text-white shadow-fab transition-transform active:scale-95"
+          className="pointer-events-auto absolute right-5 bottom-[104px] flex h-fab w-fab items-center justify-center rounded-full bg-accent text-white shadow-fab transition-transform active:scale-95"
           aria-label="새 할 일"
           style={{ marginBottom: "env(safe-area-inset-bottom)" }}
         >
@@ -39,14 +39,14 @@ export default function GlobalAddSheet() {
 
 function AddSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { userId } = useUserId();
-  const today = todayString();
+  const { selectedDate } = useSelectedDate();
 
   return (
     <Sheet open={open} onClose={onClose} title="새 할 일">
       <TodoForm
         initial={{
           title: "",
-          dueDate: today,
+          dueDate: selectedDate,
           categoryId: null,
           method: "tap",
           targetCount: 5,

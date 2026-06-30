@@ -107,3 +107,31 @@ textarea {
 .sheet-panel {
   animation: sheet-up 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+/* 캘린더 월 전환 슬라이드 */
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(40%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes slide-in-from-left {
+  from {
+    transform: translateX(-40%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.slide-in-from-right {
+  animation: slide-in-from-right 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.slide-in-from-left {
+  animation: slide-in-from-left 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}

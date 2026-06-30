@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PageHeader from "@/components/ui/PageHeader";
 import ProgressBar from "@/components/ProgressBar";
 import EmptyState from "@/components/EmptyState";
@@ -11,6 +11,7 @@ import { useCategories } from "@/hooks/useCategories";
 import { todayString, isPast, formatMonthDay } from "@/lib/date";
 import { reorderTodos } from "@/lib/db/repo";
 import { dispatchTodoChanged } from "@/lib/events";
+import { useSelectedDate } from "@/components/SelectedDateProvider";
 import type { Todo } from "@/types";
 
 type Tab = "today" | "past";
@@ -19,6 +20,12 @@ export default function HomePage() {
   const [tab, setTab] = useState<Tab>("today");
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const today = todayString();
+
+  // 홈 페이지에서 + 누르면 오늘 날짜로 추가됨
+  const { setSelectedDate } = useSelectedDate();
+  useEffect(() => {
+    setSelectedDate(today);
+  }, [today, setSelectedDate]);
 
   const { categories } = useCategories();
   const todayQuery = useTodosByDate(today);

@@ -5,6 +5,7 @@ import SyncRunner from "@/components/SyncRunner";
 import AutoSeedRunner from "@/components/AutoSeedRunner";
 import GlobalAddSheet from "@/components/GlobalAddSheet";
 import AuthProvider from "@/components/AuthProvider";
+import SelectedDateProvider from "@/components/SelectedDateProvider";
 
 export const metadata: Metadata = {
   title: "투두리스트",
@@ -25,16 +26,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body className="min-h-screen bg-surface">
         <AuthProvider>
-          <SyncRunner />
-          <AutoSeedRunner />
-          <div
-            className="mx-auto w-full max-w-app min-h-screen bg-bg"
-            style={{ paddingBottom: "calc(84px + env(safe-area-inset-bottom))" }}
-          >
-            {children}
-          </div>
-          <GlobalAddSheet />
-          <BottomNav />
+          <SelectedDateProvider>
+            <SyncRunner />
+            <AutoSeedRunner />
+            <div
+              className="mx-auto w-full max-w-app min-h-screen bg-bg"
+              style={{ paddingBottom: "calc(96px + env(safe-area-inset-bottom))" }}
+            >
+              {children}
+            </div>
+            <GlobalAddSheet />
+            <BottomNav />
+          </SelectedDateProvider>
         </AuthProvider>
       </body>
     </html>
