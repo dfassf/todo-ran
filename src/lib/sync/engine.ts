@@ -11,9 +11,7 @@ const PULL_TABLES = ["categories", "todos"] as const;
 export const isSupabaseConfigured = (): boolean => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  return (
-    !!url && !!key && !url.includes("placeholder") && !key.includes("placeholder")
-  );
+  return !!url && !!key && !url.includes("placeholder") && !key.includes("placeholder");
 };
 
 const getAuthedUserId = async (): Promise<string | null> => {
@@ -114,7 +112,12 @@ export const pullChanges = async (userId: string): Promise<{ pulled: number }> =
       .select("*")
       .eq("user_id", userId)
       .gt("updated_at", lastPulled);
-    if (error) throw error;
+    if (error) {
+      // Supabase 에러는 { message, code, details, hint } 순수 객체 — 어느 테이블 pull에서 났는지 붙여서 던짐
+      throw new Error(
+        `pull categories 실패: ${error.message} (code=${error.code ?? "?"}, details=${error.details ?? "?"}, hint=${error.hint ?? "?"})`
+      );
+    }
 
     for (const remote of (data ?? []) as Category[]) {
       const local = await db.categories.get(remote.id);
@@ -133,7 +136,11 @@ export const pullChanges = async (userId: string): Promise<{ pulled: number }> =
       .select("*")
       .eq("user_id", userId)
       .gt("updated_at", lastPulled);
-    if (error) throw error;
+    if (error) {
+      throw new Error(
+        `pull todos 실패: ${error.message} (code=${error.code ?? "?"}, details=${error.details ?? "?"}, hint=${error.hint ?? "?"})`
+      );
+    }
 
     for (const remote of (data ?? []) as Todo[]) {
       const local = await db.todos.get(remote.id);

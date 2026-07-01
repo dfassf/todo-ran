@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useAuth } from "./useAuth";
 import { sync } from "@/lib/sync/engine";
+import { logError } from "@/lib/error-log";
 
 const PULL_INTERVAL_MS = 30_000;
 
@@ -20,8 +21,8 @@ export const useSync = () => {
       inFlight.current = true;
       try {
         await sync(user.id);
-      } catch (e) {
-        console.error("[sync] failed:", e);
+      } catch (error) {
+        logError({ context: "sync.run", error });
       } finally {
         inFlight.current = false;
       }

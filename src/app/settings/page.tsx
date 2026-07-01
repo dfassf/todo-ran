@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Trash2, LogIn, LogOut, ChevronRight } from "lucide-react";
+import { Trash2, LogIn, LogOut, ChevronRight, MessageSquare } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import CategoryDot from "@/components/CategoryDot";
 import CategoryPicker from "@/components/CategoryPicker";
+import FeedbackSheet from "@/components/FeedbackSheet";
 import { useCategories } from "@/hooks/useCategories";
 import { useAuth, signOut } from "@/hooks/useAuth";
 import { DEFAULT_COLORS } from "@/lib/colors";
@@ -20,6 +21,7 @@ export default function SettingsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingLabel, setEditingLabel] = useState("");
   const [editingColor, setEditingColor] = useState("");
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const submitNew = async () => {
     if (!newLabel.trim()) return;
@@ -146,6 +148,25 @@ export default function SettingsPage() {
           </Button>
         </div>
       </Section>
+
+      <Section title="도움말">
+        <button
+          type="button"
+          onClick={() => setFeedbackOpen(true)}
+          className="flex h-control-lg w-full items-center justify-between rounded-md bg-surface px-4 text-body text-text active:bg-surface-strong"
+        >
+          <span className="flex items-center gap-2">
+            <MessageSquare size={18} className="text-text-sub" />
+            문제 접수
+          </span>
+          <ChevronRight size={18} className="text-muted" />
+        </button>
+        <p className="mt-2 text-caption text-muted">
+          안 되는 게 있거나 아이디어가 있으면 알려주세요.
+        </p>
+      </Section>
+
+      <FeedbackSheet open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
     </div>
   );
 }

@@ -21,14 +21,16 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-20 w-full max-w-app -translate-x-1/2 px-4"
+      // 알약 바깥 여백 영역이 클릭을 흡수하지 않도록 nav는 pointer-events: none.
+      // 실제 클릭을 받아야 하는 알약(ul)에만 pointer-events: auto.
+      className="pointer-events-none fixed bottom-0 left-1/2 z-20 w-full max-w-app -translate-x-1/2 px-4"
       style={{
         paddingBottom: "calc(12px + env(safe-area-inset-bottom))",
       }}
       aria-label="하단 내비게이션"
     >
       <ul
-        className="flex h-[68px] items-center justify-around rounded-[28px] bg-bg px-2"
+        className="pointer-events-auto flex h-[68px] items-center justify-around rounded-[28px] bg-bg px-2"
         style={{
           boxShadow: "0 4px 16px rgba(15, 23, 42, 0.08), 0 1px 3px rgba(15, 23, 42, 0.04)",
         }}
