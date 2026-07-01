@@ -42,7 +42,7 @@ export default function HomePage() {
 
   return (
     <div>
-      <PageHeader title={formatMonthDay(today)} subtitle="오늘 하루도 화이팅이에요" />
+      <PageHeader title={formatMonthDay(today)} subtitle="오늘 하루도 화이팅이에요 😊" />
 
       <div className="mx-5 mb-4 flex gap-1 rounded-md bg-surface-strong p-1">
         <TabButton active={tab === "today"} onClick={() => setTab("today")}>

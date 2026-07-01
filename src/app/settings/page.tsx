@@ -157,12 +157,12 @@ export default function SettingsPage() {
         >
           <span className="flex items-center gap-2">
             <MessageSquare size={18} className="text-text-sub" />
-            문제 접수
+            피드백 보내기
           </span>
           <ChevronRight size={18} className="text-muted" />
         </button>
         <p className="mt-2 text-caption text-muted">
-          안 되는 게 있거나 아이디어가 있으면 알려주세요.
+          불편했던 점이나 있으면 좋을 것 같은 기능을 알려주세요.
         </p>
       </Section>
 

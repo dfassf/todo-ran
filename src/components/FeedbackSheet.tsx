@@ -69,11 +69,11 @@ export default function FeedbackSheet({ open, onClose }: Props) {
   };
 
   return (
-    <Sheet open={open} onClose={handleClose} title="문제 접수">
+    <Sheet open={open} onClose={handleClose} title="피드백 보내기">
       {done ? (
         <div className="pb-4 text-center">
-          <p className="text-title">고마워요</p>
-          <p className="mt-2 text-sub text-muted">전달됐어요. 빨리 확인할게요.</p>
+          <p className="text-title">고마워요 🙏</p>
+          <p className="mt-2 text-sub text-muted">잘 전달됐어요. 빨리 확인할게요.</p>
           <div className="mt-6">
             <Button fullWidth onClick={handleClose}>
               닫기
@@ -102,7 +102,7 @@ export default function FeedbackSheet({ open, onClose }: Props) {
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={6}
-              placeholder="어떤 상황이었는지, 어떻게 하면 재현되는지 편하게 적어주세요."
+              placeholder="편하게 적어주세요. 어떤 상황이었는지 알려주시면 큰 도움이 돼요."
               className="block w-full rounded-md border border-transparent bg-surface-strong px-4 py-3 text-body text-text outline-none transition-colors placeholder:text-muted focus:border-accent focus:bg-bg"
             />
           </div>

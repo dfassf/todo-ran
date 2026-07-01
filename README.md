@@ -41,6 +41,7 @@ npm run test:coverage    # 테스트 커버리지 확인
 
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) — 앱이 어떻게 구성되어 있는지, 데이터가 어떻게 흐르는지, 왜 이렇게 만들었는지
 - [docs/SCHEMA.md](./docs/SCHEMA.md) — DB 표 구조, 접근 권한, 파일 저장 방식
+- [docs/EVENTS.md](./docs/EVENTS.md) — 사용자 행동 이벤트 파이프라인 설계 (Phase 1 미구현)
 
 ## 라이선스
 
