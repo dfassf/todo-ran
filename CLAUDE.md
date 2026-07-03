@@ -52,10 +52,10 @@
 
 ## Git
 
-- 이메일: REDACTED-EMAIL
 - 메시지: 한국어
 - Co-Authored-By 줄 추가 금지
 - 커밋/푸시는 명시적 지시가 있을 때만
+- 커밋 이메일은 전역 CLAUDE.md 규칙 적용
 
 ## 배포
 
