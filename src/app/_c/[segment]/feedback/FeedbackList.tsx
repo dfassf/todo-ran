@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import EmptyState from "@/components/EmptyState";
+import { useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Check } from "lucide-react";
 
-interface Feedback {
+export interface Feedback {
   id: string;
   user_id: string | null;
   kind: "issue" | "idea" | "other";
@@ -30,50 +29,40 @@ const KIND_COLOR: Record<Feedback["kind"], string> = {
   other: "bg-surface-strong text-text-sub",
 };
 
-export default function AdminFeedbackPage() {
-  const [items, setItems] = useState<Feedback[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<Filter>("unresolved");
+interface Props {
+  items: Feedback[];
+  filter: Filter;
+  onResolve: (id: string) => Promise<{ ok: boolean; error?: string }>;
+  emptyContent: React.ReactNode;
+}
 
-  const fetchList = () => {
-    setLoading(true);
-    const supabase = createSupabaseBrowserClient();
-    let query = supabase
-      .from("feedback")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(100);
-    if (filter === "unresolved") {
-      query = query.is("resolved_at", null);
-    }
-    query.then(({ data, error }) => {
-      if (error) {
-        console.error("[admin/feedback] fetch failed:", error);
-        setLoading(false);
-        return;
-      }
-      setItems((data ?? []) as Feedback[]);
-      setLoading(false);
+// 피드백 목록 표시 + 필터 토글 + 확인 처리 인터랙션.
+// 필터 변경은 URL 쿼리 갱신 → 서버 재렌더.
+// 확인 처리는 서버 액션 호출 후 router.refresh().
+export default function FeedbackList({ items, filter, onResolve, emptyContent }: Props) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [pending, startTransition] = useTransition();
+
+  const setFilter = (next: Filter) => {
+    const params = new URLSearchParams(searchParams);
+    if (next === "unresolved") params.delete("filter");
+    else params.set("filter", next);
+    const qs = params.toString();
+    startTransition(() => {
+      router.replace(qs ? `?${qs}` : "?", { scroll: false });
     });
   };
 
-  useEffect(() => {
-    // 서버 데이터 fetch 후 state 반영 — 외부 시스템 동기화 목적, 의도된 패턴
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchList();
-  }, [filter]);
-
-  const markResolved = async (id: string) => {
-    const supabase = createSupabaseBrowserClient();
-    const { error } = await supabase
-      .from("feedback")
-      .update({ resolved_at: new Date().toISOString() })
-      .eq("id", id);
-    if (error) {
-      alert("실패했어요: " + error.message);
-      return;
-    }
-    fetchList();
+  const handleResolve = (id: string) => {
+    startTransition(async () => {
+      const res = await onResolve(id);
+      if (!res.ok) {
+        alert("실패했어요: " + (res.error ?? "알 수 없는 오류"));
+        return;
+      }
+      router.refresh();
+    });
   };
 
   return (
@@ -87,13 +76,8 @@ export default function AdminFeedbackPage() {
         </FilterTab>
       </div>
 
-      {loading ? (
-        <div className="flex min-h-[40vh] items-center justify-center text-muted">불러오는 중…</div>
-      ) : items.length === 0 ? (
-        <EmptyState
-          title={filter === "unresolved" ? "미확인 피드백이 없어요" : "피드백이 없어요"}
-          description={filter === "unresolved" ? "모두 확인 처리됐어요." : undefined}
-        />
+      {items.length === 0 ? (
+        emptyContent
       ) : (
         <ul className="divide-y divide-border">
           {items.map((fb) => (
@@ -122,8 +106,9 @@ export default function AdminFeedbackPage() {
                 {!fb.resolved_at && (
                   <button
                     type="button"
-                    onClick={() => markResolved(fb.id)}
-                    className="flex h-8 shrink-0 items-center gap-1 rounded-sm bg-accent-soft px-2 text-tiny font-semibold text-accent active:opacity-80"
+                    onClick={() => handleResolve(fb.id)}
+                    disabled={pending}
+                    className="flex h-8 shrink-0 items-center gap-1 rounded-sm bg-accent-soft px-2 text-tiny font-semibold text-accent active:opacity-80 disabled:opacity-50"
                   >
                     <Check size={14} />
                     확인

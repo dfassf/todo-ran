@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
-import EmptyState from "@/components/EmptyState";
+import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-interface ErrorLog {
+export interface ErrorLog {
   id: string;
   user_id: string | null;
   context: string;
@@ -16,45 +14,10 @@ interface ErrorLog {
   created_at: string;
 }
 
-// 관리자용 에러 로그 목록.
-// 최근 100건만 조회. detail은 클릭 시 펼쳐서 확인.
-export default function AdminErrorsPage() {
-  const [logs, setLogs] = useState<ErrorLog[]>([]);
-  const [loading, setLoading] = useState(true);
+// 에러 로그 리스트 렌더 + 펼치기 인터랙션.
+// 데이터 fetch는 서버 컴포넌트가 하고 여기서는 표시만.
+export default function ErrorLogList({ logs }: { logs: ErrorLog[] }) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const supabase = createSupabaseBrowserClient();
-    supabase
-      .from("error_logs")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(100)
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("[admin/errors] fetch failed:", error);
-          setLoading(false);
-          return;
-        }
-        setLogs((data ?? []) as ErrorLog[]);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center text-muted">불러오는 중…</div>
-    );
-  }
-
-  if (logs.length === 0) {
-    return (
-      <EmptyState
-        title="에러 로그가 없어요"
-        description="아직 아무 문제 없이 잘 돌아가고 있어요."
-      />
-    );
-  }
 
   return (
     <ul className="divide-y divide-border">

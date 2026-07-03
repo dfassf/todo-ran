@@ -5,6 +5,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Next.js가 서버 전용 모듈 보호에 쓰는 마커. 테스트 환경에선 무해한 stub으로 대체.
+      "server-only": path.resolve(__dirname, "./__tests__/stubs/server-only.ts"),
     },
   },
   test: {

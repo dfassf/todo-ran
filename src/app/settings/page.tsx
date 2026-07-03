@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Trash2, LogIn, LogOut, ChevronRight, MessageSquare, Shield } from "lucide-react";
+import { Trash2, LogIn, LogOut, ChevronRight, MessageSquare } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -12,7 +12,6 @@ import FeedbackSheet from "@/components/FeedbackSheet";
 import { useCategories } from "@/hooks/useCategories";
 import { useAuth, signOut } from "@/hooks/useAuth";
 import { DEFAULT_COLORS } from "@/lib/colors";
-import { isAdminEmail } from "@/lib/admin";
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -166,21 +165,6 @@ export default function SettingsPage() {
           불편했던 점이나 있으면 좋을 것 같은 기능을 알려주세요.
         </p>
       </Section>
-
-      {isAdminEmail(user?.email) && (
-        <Section title="관리자">
-          <Link
-            href="/admin/errors"
-            className="flex h-control-lg w-full items-center justify-between rounded-md bg-surface px-4 text-body text-text active:bg-surface-strong"
-          >
-            <span className="flex items-center gap-2">
-              <Shield size={18} className="text-text-sub" />
-              에러 · 피드백 조회
-            </span>
-            <ChevronRight size={18} className="text-muted" />
-          </Link>
-        </Section>
-      )}
 
       <FeedbackSheet open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
     </div>
