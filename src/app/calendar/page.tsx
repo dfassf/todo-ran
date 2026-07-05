@@ -134,10 +134,11 @@ export default function CalendarPage() {
               const isSelected = isSameDay(d, fromDateString(selected));
               const today = isToday(d);
 
-              const dots = dayTodos2
+              // 앞 3개 할 일마다 점 하나씩. 카테고리 있으면 그 색, 없으면 회색.
+              // filter로 빼지 않는 이유: 할 일 개수와 점 개수가 안 맞으면 오해 유발.
+              const dots: string[] = dayTodos2
                 .slice(0, 3)
-                .map((t) => (t.category_id ? catMap.get(t.category_id)?.color : null))
-                .filter(Boolean) as string[];
+                .map((t) => (t.category_id && catMap.get(t.category_id)?.color) || "#D1D6DB");
 
               return (
                 <button
