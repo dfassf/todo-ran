@@ -50,7 +50,7 @@ function AddSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
           categoryId: null,
           method: "tap",
           targetCount: 5,
-          targetSeconds: 60,
+          targetSeconds: 300,
         }}
         submitLabel="추가"
         submittingLabel="추가 중…"

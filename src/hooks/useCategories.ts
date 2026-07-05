@@ -32,10 +32,11 @@ export const useCategories = () => {
     return () => window.removeEventListener(CATEGORY_CHANGED, onChange);
   }, [refresh]);
 
-  const create = async (label: string, color: string) => {
-    if (!userId) return;
-    await repoCreate({ userId, label, color });
+  const create = async (label: string, color: string): Promise<Category | null> => {
+    if (!userId) return null;
+    const created = await repoCreate({ userId, label, color });
     dispatchCategoryChanged();
+    return created;
   };
 
   const update = async (

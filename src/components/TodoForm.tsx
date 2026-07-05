@@ -7,6 +7,10 @@ import Input from "./ui/Input";
 import Button from "./ui/Button";
 import Chip from "./ui/Chip";
 import MethodTile from "./ui/MethodTile";
+import Stepper from "./ui/Stepper";
+import CategoryPicker from "./CategoryPicker";
+import { DEFAULT_COLORS } from "@/lib/colors";
+import { Plus, X } from "lucide-react";
 import { useCategories } from "@/hooks/useCategories";
 
 const METHOD_OPTIONS: { value: CompletionMethod; label: string; hint: string }[] = [
@@ -41,7 +45,7 @@ export default function TodoForm({
   onCancel,
   onSubmit,
 }: Props) {
-  const { categories } = useCategories();
+  const { categories, create: createCategory } = useCategories();
 
   const [title, setTitle] = useState(initial.title);
   const [dueDate, setDueDate] = useState(initial.dueDate);
@@ -50,6 +54,29 @@ export default function TodoForm({
   const [targetCount, setTargetCount] = useState(initial.targetCount);
   const [targetSeconds, setTargetSeconds] = useState(initial.targetSeconds);
   const [submitting, setSubmitting] = useState(false);
+
+  // 카테고리 인라인 추가 UI 상태.
+  // "+ 새 카테고리" 탭 시 폼 펼치고, 저장하면 이 폼에서 바로 사용 가능하게
+  // 새로 만든 카테고리를 자동 선택.
+  const [newCatOpen, setNewCatOpen] = useState(false);
+  const [newCatLabel, setNewCatLabel] = useState("");
+  const [newCatColor, setNewCatColor] = useState(DEFAULT_COLORS[0].value);
+  const [newCatSaving, setNewCatSaving] = useState(false);
+
+  const saveNewCategory = async () => {
+    const label = newCatLabel.trim();
+    if (!label || newCatSaving) return;
+    setNewCatSaving(true);
+    try {
+      const created = await createCategory(label, newCatColor);
+      if (created) setCategoryId(created.id); // 방금 만든 것 자동 선택
+      setNewCatOpen(false);
+      setNewCatLabel("");
+      setNewCatColor(DEFAULT_COLORS[0].value);
+    } finally {
+      setNewCatSaving(false);
+    }
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -87,19 +114,48 @@ export default function TodoForm({
 
       <div className="mt-5">
         <p className="mb-2 text-sub font-medium text-text-sub">카테고리</p>
-        {categories.length === 0 ? (
-          <p className="text-caption text-muted">카테고리가 없어요. 설정에서 먼저 만들어 주세요.</p>
-        ) : (
-          <div className="flex flex-wrap gap-x-2 gap-y-2">
-            <Chip selected={categoryId === null} onClick={() => setCategoryId(null)}>
-              없음
+        <div className="flex flex-wrap gap-x-2 gap-y-2">
+          <Chip selected={categoryId === null} onClick={() => setCategoryId(null)}>
+            없음
+          </Chip>
+          {categories.map((c: Category) => (
+            <Chip key={c.id} selected={categoryId === c.id} onClick={() => setCategoryId(c.id)}>
+              <CategoryDot color={c.color} size={8} />
+              {c.label}
             </Chip>
-            {categories.map((c: Category) => (
-              <Chip key={c.id} selected={categoryId === c.id} onClick={() => setCategoryId(c.id)}>
-                <CategoryDot color={c.color} size={8} />
-                {c.label}
-              </Chip>
-            ))}
+          ))}
+          {/* 설정 페이지로 가지 않고 이 시트 안에서 즉시 만들 수 있게. */}
+          <button
+            type="button"
+            onClick={() => setNewCatOpen((v) => !v)}
+            aria-expanded={newCatOpen}
+            className="inline-flex items-center gap-1 rounded-full border border-dashed border-border px-3 py-1.5 text-sub text-text-sub active:bg-surface"
+          >
+            {newCatOpen ? <X size={14} /> : <Plus size={14} />}새 카테고리
+          </button>
+        </div>
+
+        {newCatOpen && (
+          <div className="mt-3 rounded-md bg-surface p-3">
+            <Input
+              autoFocus
+              placeholder="이름 (예: 운동)"
+              value={newCatLabel}
+              onChange={(e) => setNewCatLabel(e.target.value)}
+            />
+            <div className="mt-3">
+              <CategoryPicker value={newCatColor} onChange={setNewCatColor} />
+            </div>
+            <Button
+              className="mt-3"
+              fullWidth
+              type="button"
+              size="md"
+              onClick={saveNewCategory}
+              disabled={!newCatLabel.trim() || newCatSaving}
+            >
+              {newCatSaving ? "만드는 중…" : "추가"}
+            </Button>
           </div>
         )}
       </div>
@@ -121,24 +177,48 @@ export default function TodoForm({
 
       {method === "count" && (
         <div className="mt-4">
-          <Input
-            type="number"
+          <Stepper
             label="목표 횟수"
-            min={1}
             value={targetCount}
-            onChange={(e) => setTargetCount(Math.max(1, Number(e.target.value)))}
+            min={1}
+            max={999}
+            suffix="회"
+            onChange={setTargetCount}
           />
         </div>
       )}
       {method === "timer" && (
         <div className="mt-4">
-          <Input
-            type="number"
-            label="목표 시간 (초)"
+          {/* 저장은 초 단위지만 UI는 분 단위로 다룸.
+              사용자는 5분/25분/1시간 같은 자연어 단위로 시간을 인지함. */}
+          <Stepper
+            label="목표 시간"
+            value={Math.max(1, Math.round(targetSeconds / 60))}
             min={1}
-            value={targetSeconds}
-            onChange={(e) => setTargetSeconds(Math.max(1, Number(e.target.value)))}
+            max={240}
+            suffix="분"
+            onChange={(mins) => setTargetSeconds(mins * 60)}
           />
+          <div className="mt-2 flex flex-wrap gap-2">
+            {[5, 10, 15, 25, 45, 60].map((m) => {
+              const selected = targetSeconds === m * 60;
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setTargetSeconds(m * 60)}
+                  className={[
+                    "h-8 rounded-full px-3 text-sub transition-colors",
+                    selected
+                      ? "bg-accent-soft text-accent font-medium"
+                      : "bg-surface-strong text-text-sub active:bg-border",
+                  ].join(" ")}
+                >
+                  {m < 60 ? `${m}분` : `${m / 60}시간`}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 

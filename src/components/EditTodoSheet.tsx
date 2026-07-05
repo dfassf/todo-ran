@@ -25,7 +25,7 @@ export default function EditTodoSheet({ todo, onClose }: Props) {
           categoryId: todo.category_id,
           method: todo.completion_method,
           targetCount: todo.target_count ?? 5,
-          targetSeconds: todo.target_seconds ?? 60,
+          targetSeconds: todo.target_seconds ?? 300,
         }}
         submitLabel="저장"
         submittingLabel="저장 중…"

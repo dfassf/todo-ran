@@ -72,8 +72,8 @@ export default function FeedbackSheet({ open, onClose }: Props) {
     <Sheet open={open} onClose={handleClose} title="피드백 보내기">
       {done ? (
         <div className="pb-4 text-center">
-          <p className="text-title">고마워요 🙏</p>
-          <p className="mt-2 text-sub text-muted">잘 전달됐어요. 빨리 확인할게요.</p>
+          <p className="text-title">소중한 의견 고마워요</p>
+          <p className="mt-2 text-sub text-muted">빠르게 검토할게요.</p>
           <div className="mt-6">
             <Button fullWidth onClick={handleClose}>
               닫기
