@@ -33,7 +33,7 @@ export default async function AdminHiddenLayout({
     notFound();
   }
 
-  const base = `/_c/${segment}`;
+  const base = `/c/${segment}`;
 
   return (
     <div>

@@ -34,37 +34,37 @@ describe("proxy 관리자 라우트 방어", () => {
     expect(res.__passthrough).toBe(true);
   });
 
-  it("/_c/ 경로에서 env 미설정 → 404", async () => {
+  it("/c/ 경로에서 env 미설정 → 404", async () => {
     const { proxy } = await import("@/proxy");
-    const res = (await proxy(buildRequest("/_c/anything"))) as Response;
+    const res = (await proxy(buildRequest("/c/anything"))) as Response;
     expect(res.status).toBe(404);
   });
 
-  it("/_c/ 세그먼트가 env와 일치 → updateSession으로 통과", async () => {
+  it("/c/ 세그먼트가 env와 일치 → updateSession으로 통과", async () => {
     process.env.ADMIN_PATH_SEGMENT = "x7k9";
     const { proxy } = await import("@/proxy");
-    const res = (await proxy(buildRequest("/_c/x7k9/errors"))) as { __passthrough?: boolean };
+    const res = (await proxy(buildRequest("/c/x7k9/errors"))) as { __passthrough?: boolean };
     expect(res.__passthrough).toBe(true);
   });
 
-  it("/_c/ 세그먼트가 env와 다름 → 404 (엔드포인트 은닉)", async () => {
+  it("/c/ 세그먼트가 env와 다름 → 404 (엔드포인트 은닉)", async () => {
     process.env.ADMIN_PATH_SEGMENT = "x7k9";
     const { proxy } = await import("@/proxy");
-    const res = (await proxy(buildRequest("/_c/wrong"))) as Response;
+    const res = (await proxy(buildRequest("/c/wrong"))) as Response;
     expect(res.status).toBe(404);
   });
 
   it("env가 너무 짧으면 통과시키지 않음 (엔트로피 부족)", async () => {
     process.env.ADMIN_PATH_SEGMENT = "ab";
     const { proxy } = await import("@/proxy");
-    const res = (await proxy(buildRequest("/_c/ab"))) as Response;
+    const res = (await proxy(buildRequest("/c/ab"))) as Response;
     expect(res.status).toBe(404);
   });
 
-  it("루트 /_c 자체(뒤에 세그먼트 없음)도 404", async () => {
+  it("루트 /c 자체(뒤에 세그먼트 없음)도 404", async () => {
     process.env.ADMIN_PATH_SEGMENT = "x7k9";
     const { proxy } = await import("@/proxy");
-    const res = (await proxy(buildRequest("/_c/"))) as Response;
+    const res = (await proxy(buildRequest("/c/"))) as Response;
     expect(res.status).toBe(404);
   });
 

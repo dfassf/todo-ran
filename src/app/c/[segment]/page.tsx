@@ -8,5 +8,5 @@ export default async function AdminHiddenIndex({
   params: Promise<{ segment: string }>;
 }) {
   const { segment } = await params;
-  redirect(`/_c/${segment}/errors`);
+  redirect(`/c/${segment}/errors`);
 }

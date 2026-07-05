@@ -33,7 +33,7 @@ describe("admin-path 세그먼트 검증", () => {
     expect(mod.isValidAdminSegment("x7k9")).toBe(true);
     expect(mod.isValidAdminSegment("x7k8")).toBe(false);
     expect(mod.isValidAdminSegment("X7K9")).toBe(false); // 대소문자 구분
-    expect(mod.getAdminRoot()).toBe("/_c/x7k9");
+    expect(mod.getAdminRoot()).toBe("/c/x7k9");
   });
 
   it("2자 이하 세그먼트 → 무효 (엔트로피 부족)", async () => {
@@ -60,7 +60,7 @@ describe("admin-path 세그먼트 검증", () => {
     process.env.ADMIN_PATH_SEGMENT = "c-42a";
     const mod = await loadModule();
     expect(mod.isValidAdminSegment("c-42a")).toBe(true);
-    expect(mod.getAdminRoot()).toBe("/_c/c-42a");
+    expect(mod.getAdminRoot()).toBe("/c/c-42a");
   });
 
   it("빈 문자열 env → 무효", async () => {

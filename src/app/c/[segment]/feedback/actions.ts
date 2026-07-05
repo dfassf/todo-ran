@@ -28,6 +28,6 @@ export const markFeedbackResolved = async (
   if (error) return { ok: false, error: error.message };
 
   // 목록 재렌더
-  revalidatePath("/_c/[segment]/feedback", "page");
+  revalidatePath("/c/[segment]/feedback", "page");
   return { ok: true };
 };
