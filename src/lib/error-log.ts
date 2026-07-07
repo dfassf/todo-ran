@@ -6,6 +6,22 @@ interface ErrorLogInput {
   error: unknown; // Error 인스턴스 또는 Supabase 에러 객체
 }
 
+// DB CHECK 제약보다 살짝 작게 잘라서 insert 실패 방지.
+// 006_hardening.sql: context 200 / message 2000 / detail 10000 / user_agent 500 / path 500
+const truncate = (s: string, max: number): string => (s.length > max ? s.slice(0, max) : s);
+
+// detail은 jsonb라 pg_column_size 기준이라 정확한 상한 계산이 어려움.
+// stack trace가 대부분의 크기를 차지하니 stack만 문자 단위로 잘라 상한 근사.
+const boundDetail = (detail: unknown): unknown => {
+  if (detail && typeof detail === "object" && "stack" in detail) {
+    const d = detail as { stack?: unknown };
+    if (typeof d.stack === "string" && d.stack.length > 5000) {
+      return { ...detail, stack: d.stack.slice(0, 5000) + "…(truncated)" };
+    }
+  }
+  return detail;
+};
+
 // 에러를 콘솔 + Supabase todoran.error_logs 테이블에 함께 기록.
 // 실패해도 앱을 절대 깨뜨리지 않도록 try/catch로 완전히 삼킴.
 export const logError = async ({ context, error }: ErrorLogInput): Promise<void> => {
@@ -32,11 +48,11 @@ export const logError = async ({ context, error }: ErrorLogInput): Promise<void>
     const { data: userData } = await supabase.auth.getUser();
     await supabase.from("error_logs").insert({
       user_id: userData.user?.id ?? null,
-      context,
-      message,
-      detail: detail as object,
-      user_agent: window.navigator.userAgent,
-      path: window.location.pathname,
+      context: truncate(context, 190),
+      message: truncate(message, 1900),
+      detail: boundDetail(detail) as object,
+      user_agent: truncate(window.navigator.userAgent, 490),
+      path: truncate(window.location.pathname, 490),
     });
   } catch {
     // 로깅 자체가 실패해도 앱은 계속 동작

@@ -100,11 +100,15 @@ export default function FeedbackSheet({ open, onClose }: Props) {
             <p className="mb-2 text-sub font-medium text-text-sub">내용</p>
             <textarea
               value={body}
-              onChange={(e) => setBody(e.target.value)}
+              onChange={(e) => setBody(e.target.value.slice(0, 8000))}
               rows={6}
+              maxLength={8000}
               placeholder="편하게 적어주세요. 어떤 상황이었는지 알려주시면 큰 도움이 돼요."
               className="block w-full rounded-md border border-transparent bg-surface-strong px-4 py-3 text-body text-text outline-none transition-colors placeholder:text-muted focus:border-accent focus:bg-bg"
             />
+            {body.length > 7000 && (
+              <p className="mt-1 text-caption text-muted">{body.length} / 8000</p>
+            )}
           </div>
 
           <div className="mt-8 flex gap-3 pb-2">

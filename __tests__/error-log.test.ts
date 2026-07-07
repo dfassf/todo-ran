@@ -111,6 +111,29 @@ describe("logError", () => {
     const row = state.inserted[0] as { user_id: string | null };
     expect(row.user_id).toBe("user-a");
   });
+
+  it("context가 200자 넘으면 190자로 잘라서 저장 (DB CHECK 방어)", async () => {
+    const longCtx = "a".repeat(500);
+    await logError({ context: longCtx, error: new Error("x") });
+    const row = state.inserted[0] as { context: string };
+    expect(row.context.length).toBe(190);
+  });
+
+  it("message가 2000자 넘으면 1900자로 잘라서 저장", async () => {
+    const longMsg = "m".repeat(5000);
+    await logError({ context: "test", error: new Error(longMsg) });
+    const row = state.inserted[0] as { message: string };
+    expect(row.message.length).toBe(1900);
+  });
+
+  it("stack trace가 5000자 넘으면 잘라서 저장 (jsonb 크기 방어)", async () => {
+    const err = new Error("short");
+    err.stack = "s".repeat(10000);
+    await logError({ context: "test", error: err });
+    const row = state.inserted[0] as { detail: { stack: string } };
+    expect(row.detail.stack.length).toBeLessThan(5100); // 5000 + "…(truncated)"
+    expect(row.detail.stack.endsWith("…(truncated)")).toBe(true);
+  });
 });
 
 describe("logError — Supabase 미설정", () => {
