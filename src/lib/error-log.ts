@@ -45,12 +45,18 @@ export const logError = async ({ context, error }: ErrorLogInput): Promise<void>
   if (!isSupabaseConfigured() || typeof window === "undefined") return;
   try {
     const supabase = createSupabaseBrowserClient();
-    const { data: userData } = await supabase.auth.getUser();
+    // getUser 실패해도 로그 자체는 남기는 게 목적 (익명 로그로라도 남겨야 원인 파악 가능).
+    // 실패 원인은 detail 에 병기해서 나중에 조회할 수 있게.
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
+    const userId = userData?.user?.id ?? null;
+    const enrichedDetail = userErr
+      ? { ...(boundDetail(detail) as object), _getUserError: userErr.message }
+      : (boundDetail(detail) as object);
     await supabase.from("error_logs").insert({
-      user_id: userData.user?.id ?? null,
+      user_id: userId,
       context: truncate(context, 190),
       message: truncate(message, 1900),
-      detail: boundDetail(detail) as object,
+      detail: enrichedDetail,
       user_agent: truncate(window.navigator.userAgent, 490),
       path: truncate(window.location.pathname, 490),
     });

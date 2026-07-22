@@ -23,7 +23,14 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export const isCurrentUserAdmin = async (): Promise<boolean> => {
   const supabase = await createSupabaseServerClient();
 
-  const { data: userResp } = await supabase.auth.getUser();
+  // getUser() 는 서버 요청이라 네트워크 오류/세션 만료로 실패할 수 있음.
+  // error 를 명시적으로 처리해서 원인을 서버 로그에 남기고 false 반환.
+  // (이 함수는 "관리자 여부" 판정이라 어떤 오류에서도 안전한 쪽=false 로 fail closed)
+  const { data: userResp, error: userErr } = await supabase.auth.getUser();
+  if (userErr) {
+    console.warn("[staff] getUser 실패, 관리자 아님으로 처리:", userErr.message);
+    return false;
+  }
   if (!userResp.user) return false;
 
   // 이메일 확인 안 된 계정은 관리자 진입 차단.
@@ -31,6 +38,9 @@ export const isCurrentUserAdmin = async (): Promise<boolean> => {
   if (!userResp.user.email_confirmed_at) return false;
 
   const { data, error } = await supabase.rpc("has_role", { required_role: "admin" });
-  if (error) return false;
+  if (error) {
+    console.warn("[staff] has_role RPC 실패:", error.message);
+    return false;
+  }
   return data === true;
 };

@@ -49,7 +49,12 @@ export default function FeedbackSheet({ open, onClose }: Props) {
     setSubmitting(true);
     try {
       const supabase = createSupabaseBrowserClient();
-      const { data: userData } = await supabase.auth.getUser();
+      // getUser() 실패해도 익명(user_id null)로 저장은 되지만, 그 실패 자체를 기록해서
+      // "왜 피드백이 오는데 로그인 정보가 없나" 나중에 추적 가능하게.
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (userErr) {
+        logError({ context: "feedback.getUser", error: userErr });
+      }
       const { error } = await supabase.from("feedback").insert({
         user_id: userData.user?.id ?? null,
         kind,
